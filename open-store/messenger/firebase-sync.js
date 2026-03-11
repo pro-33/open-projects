@@ -1,11 +1,12 @@
-// Firebase конфигурация для синхронизации между устройствами
-// Вызывается из app.js после инициализации state
+// Firebase синхронизация для Messenger
+// Запускается ПОСЛЕ app.js
 
-function initFirebaseSync() {
-    // Проверяем что state существует
+console.log('Firebase синхронизация: Ожидание инициализации...');
+
+// Ждём пока state инициализируется
+setTimeout(function() {
     if (typeof window.state === 'undefined') {
-        console.log('state ещё не определён, ждём...');
-        setTimeout(initFirebaseSync, 500);
+        console.error('Firebase: state не определён!');
         return;
     }
     
@@ -21,101 +22,93 @@ function initFirebaseSync() {
     });
     
     const database = firebase.database();
+    console.log('✅ Firebase синхронизация запущена!');
     
-    console.log('Firebase синхронизация запущена!');
+    // ===== СИХРОНИЗАЦИЯ ПОЛЬЗОВАТЕЛЕЙ =====
+    const usersRef = database.ref('users');
     
-    // Синхронизация пользователей
-    function syncUsers() {
-        const usersRef = database.ref('users');
-        usersRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                window.state.users = Object.values(data);
-                localStorage.setItem('openstore_all_users', JSON.stringify(window.state.users));
-                if (typeof window.loadChats === 'function') window.loadChats();
-                console.log('Пользователи синхронизированы:', window.state.users.length);
-            }
-        });
-        
-        window.saveUsers = function() {
+    // Загрузка из Firebase
+    usersRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            window.state.users = Object.values(data);
             localStorage.setItem('openstore_all_users', JSON.stringify(window.state.users));
-            const usersObj = {};
-            window.state.users.forEach(user => {
-                usersObj[user.name] = user;
-            });
-            database.ref('users').set(usersObj);
-        };
-    }
+            console.log('👥 Пользователи синхронизированы:', window.state.users.length);
+            if (typeof loadChats === 'function') loadChats();
+        }
+    });
     
-    // Синхронизация сообщений
-    function syncMessages() {
-        const messagesRef = database.ref('messages');
-        messagesRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                window.state.messages = Object.values(data);
-                localStorage.setItem('openmessenger_messages', JSON.stringify(window.state.messages));
-                if (window.state.activeChat && typeof window.loadMessages === 'function') {
-                    window.loadMessages(window.state.activeChat);
-                }
-                if (typeof window.loadChats === 'function') window.loadChats();
-                console.log('Сообщения синхронизированы:', window.state.messages.length);
-            }
+    // Сохранение в Firebase
+    window.saveUsers = function() {
+        localStorage.setItem('openstore_all_users', JSON.stringify(window.state.users));
+        const usersObj = {};
+        window.state.users.forEach(user => {
+            usersObj[user.name] = user;
         });
-        
-        window.saveMessages = function() {
+        usersRef.set(usersObj);
+    };
+    
+    // ===== СИХРОНИЗАЦИЯ СООБЩЕНИЙ =====
+    const messagesRef = database.ref('messages');
+    
+    messagesRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            window.state.messages = Object.values(data);
             localStorage.setItem('openmessenger_messages', JSON.stringify(window.state.messages));
-            const messagesObj = {};
-            window.state.messages.forEach(msg => {
-                messagesObj[msg.id] = msg;
-            });
-            database.ref('messages').set(messagesObj);
-        };
-    }
-    
-    // Синхронизация блокировок
-    function syncBlocks() {
-        const blocksRef = database.ref('blocks');
-        blocksRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                window.state.blockedUsers = data;
-                localStorage.setItem('openmessenger_blocks', JSON.stringify(window.state.blockedUsers));
-                console.log('Блокировки синхронизированы');
+            console.log('💬 Сообщения синхронизированы:', window.state.messages.length);
+            if (window.state.activeChat && typeof loadMessages === 'function') {
+                loadMessages(window.state.activeChat);
             }
+            if (typeof loadChats === 'function') loadChats();
+        }
+    });
+    
+    window.saveMessages = function() {
+        localStorage.setItem('openmessenger_messages', JSON.stringify(window.state.messages));
+        const messagesObj = {};
+        window.state.messages.forEach(msg => {
+            messagesObj[msg.id] = msg;
         });
-        
-        window.saveBlockedUsers = function() {
+        messagesRef.set(messagesObj);
+    };
+    
+    // ===== СИХРОНИЗАЦИЯ БЛОКИРОВОК =====
+    const blocksRef = database.ref('blocks');
+    
+    blocksRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data !== null) {
+            window.state.blockedUsers = data;
             localStorage.setItem('openmessenger_blocks', JSON.stringify(window.state.blockedUsers));
-            database.ref('blocks').set(window.state.blockedUsers);
-        };
-    }
+            console.log('🚫 Блокировки синхронизированы');
+        }
+    });
     
-    // Синхронизация сообщений сайта
-    function syncSiteMessages() {
-        const messagesRef = database.ref('siteMessages');
-        messagesRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                window.state.siteMessages = Object.values(data);
-                localStorage.setItem('openstore_messages', JSON.stringify(window.state.siteMessages));
-                console.log('Сообщения сайта синхронизированы:', window.state.siteMessages.length);
-            }
-        });
-        
-        window.saveSiteMessages = function() {
+    window.saveBlockedUsers = function() {
+        localStorage.setItem('openmessenger_blocks', JSON.stringify(window.state.blockedUsers));
+        blocksRef.set(window.state.blockedUsers);
+    };
+    
+    // ===== СИХРОНИЗАЦИЯ СООБЩЕНИЙ САЙТА =====
+    const siteMessagesRef = database.ref('siteMessages');
+    
+    siteMessagesRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            window.state.siteMessages = Object.values(data);
             localStorage.setItem('openstore_messages', JSON.stringify(window.state.siteMessages));
-            const messagesObj = {};
-            window.state.siteMessages.forEach(msg => {
-                messagesObj[msg.id] = msg;
-            });
-            database.ref('siteMessages').set(messagesObj);
-        };
-    }
+            console.log('📢 Сообщения сайта синхронизированы:', window.state.siteMessages.length);
+        }
+    });
     
-    // Запуск синхронизации
-    syncUsers();
-    syncMessages();
-    syncBlocks();
-    syncSiteMessages();
-}
+    window.saveSiteMessages = function() {
+        localStorage.setItem('openstore_messages', JSON.stringify(window.state.siteMessages));
+        const messagesObj = {};
+        window.state.siteMessages.forEach(msg => {
+            messagesObj[msg.id] = msg;
+        });
+        siteMessagesRef.set(messagesObj);
+    };
+    
+}, 200);

@@ -25,11 +25,6 @@ async function init() {
     checkAuth();
     
     setupEventListeners();
-    
-    // Запускаем Firebase синхронизацию ПОСЛЕ инициализации
-    if (typeof initFirebaseSync === 'function') {
-        setTimeout(initFirebaseSync, 100);
-    }
 }
 
 // Загрузка данных из Open Store
