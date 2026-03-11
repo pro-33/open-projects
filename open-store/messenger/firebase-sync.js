@@ -1,12 +1,23 @@
 // Firebase синхронизация для Messenger
 // Запускается ПОСЛЕ app.js
 
-console.log('Firebase синхронизация: Ожидание инициализации...');
-
-// Ждём пока state инициализируется
+// Ждём 1 секунду пока app.js инициализирует state
 setTimeout(function() {
+    console.log('Firebase: Проверяю state...');
+    
     if (typeof window.state === 'undefined') {
-        console.error('Firebase: state не определён!');
+        console.log('Firebase: state не готов, жду ещё...');
+        setTimeout(initFirebase, 500);
+        return;
+    }
+    
+    initFirebase();
+    
+}, 1000);
+
+function initFirebase() {
+    if (typeof window.state === 'undefined') {
+        console.error('Firebase: state так и не определился!');
         return;
     }
     
