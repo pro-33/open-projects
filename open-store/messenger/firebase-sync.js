@@ -1,7 +1,7 @@
 // Firebase синхронизация для Messenger
 // Запускается ПОСЛЕ app.js
 
-// Ждём 1 секунду пока app.js инициализирует state
+// Ждём 1.5 секунды пока app.js инициализирует state
 setTimeout(function() {
     console.log('Firebase: Проверяю state...');
     
@@ -13,7 +13,7 @@ setTimeout(function() {
     
     initFirebase();
     
-}, 1000);
+}, 1500);
 
 function initFirebase() {
     if (typeof window.state === 'undefined') {
@@ -39,7 +39,7 @@ function initFirebase() {
     const usersRef = database.ref('users');
     
     // Загрузка из Firebase
-    usersRef.on('value', (snapshot) => {
+    usersRef.on('value', function(snapshot) {
         const data = snapshot.val();
         if (data) {
             window.state.users = Object.values(data);
@@ -53,7 +53,7 @@ function initFirebase() {
     window.saveUsers = function() {
         localStorage.setItem('openstore_all_users', JSON.stringify(window.state.users));
         const usersObj = {};
-        window.state.users.forEach(user => {
+        window.state.users.forEach(function(user) {
             usersObj[user.name] = user;
         });
         usersRef.set(usersObj);
@@ -62,7 +62,7 @@ function initFirebase() {
     // ===== СИХРОНИЗАЦИЯ СООБЩЕНИЙ =====
     const messagesRef = database.ref('messages');
     
-    messagesRef.on('value', (snapshot) => {
+    messagesRef.on('value', function(snapshot) {
         const data = snapshot.val();
         if (data) {
             window.state.messages = Object.values(data);
@@ -78,7 +78,7 @@ function initFirebase() {
     window.saveMessages = function() {
         localStorage.setItem('openmessenger_messages', JSON.stringify(window.state.messages));
         const messagesObj = {};
-        window.state.messages.forEach(msg => {
+        window.state.messages.forEach(function(msg) {
             messagesObj[msg.id] = msg;
         });
         messagesRef.set(messagesObj);
@@ -87,7 +87,7 @@ function initFirebase() {
     // ===== СИХРОНИЗАЦИЯ БЛОКИРОВОК =====
     const blocksRef = database.ref('blocks');
     
-    blocksRef.on('value', (snapshot) => {
+    blocksRef.on('value', function(snapshot) {
         const data = snapshot.val();
         if (data !== null) {
             window.state.blockedUsers = data;
@@ -104,7 +104,7 @@ function initFirebase() {
     // ===== СИХРОНИЗАЦИЯ СООБЩЕНИЙ САЙТА =====
     const siteMessagesRef = database.ref('siteMessages');
     
-    siteMessagesRef.on('value', (snapshot) => {
+    siteMessagesRef.on('value', function(snapshot) {
         const data = snapshot.val();
         if (data) {
             window.state.siteMessages = Object.values(data);
@@ -116,10 +116,9 @@ function initFirebase() {
     window.saveSiteMessages = function() {
         localStorage.setItem('openstore_messages', JSON.stringify(window.state.siteMessages));
         const messagesObj = {};
-        window.state.siteMessages.forEach(msg => {
+        window.state.siteMessages.forEach(function(msg) {
             messagesObj[msg.id] = msg;
         });
         siteMessagesRef.set(messagesObj);
     };
-    
-}, 200);
+}
