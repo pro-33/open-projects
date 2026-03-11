@@ -82,6 +82,8 @@
                 </div>
                 <div class="profile-menu" id="profileMenu">
                     <a href="#" onclick="openProfile()"><i class="fas fa-user"></i> Профиль</a>
+                    <a href="#" onclick="openAdminPanel()" id="adminPanelLink" style="display: none;"><i class="fas fa-shield-alt"></i> Админ-панель</a>
+                    <a href="../index.html"><i class="fas fa-home"></i> Open Projects</a>
                     <a href="../open-store/index.html"><i class="fas fa-store"></i> Open Store</a>
                     <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
                 </div>
@@ -230,6 +232,118 @@
         </div>
     </div>
 
+    <!-- Admin Panel Modal -->
+    <div class="modal" id="adminPanelModal">
+        <div class="modal-content admin-panel-content" style="max-width: 800px;">
+            <span class="close-modal" onclick="closeAdminPanel()">&times;</span>
+            <div class="admin-panel-header">
+                <h2><i class="fas fa-shield-alt"></i> Админ-панель мессенджера</h2>
+                <span class="admin-badge" id="adminBadge">Администратор</span>
+            </div>
+            
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="users" onclick="switchAdminTab('users')">
+                    <i class="fas fa-users"></i> Пользователи
+                </button>
+                <button class="admin-tab" data-tab="messages" onclick="switchAdminTab('messages')">
+                    <i class="fas fa-bullhorn"></i> Сообщения на сайт
+                </button>
+                <button class="admin-tab" data-tab="bans" onclick="switchAdminTab('bans')">
+                    <i class="fas fa-gavel"></i> Блокировки
+                </button>
+            </div>
+            
+            <!-- Пользователи -->
+            <div class="admin-tab-content active" id="usersTab">
+                <div class="admin-section">
+                    <h3><i class="fas fa-users"></i> Все пользователи</h3>
+                    <div class="admin-users-list" id="adminUsersList"></div>
+                </div>
+            </div>
+            
+            <!-- Сообщения на сайт -->
+            <div class="admin-tab-content" id="messagesTab">
+                <div class="admin-section">
+                    <h3><i class="fas fa-bullhorn"></i> Отправить сообщение на сайт</h3>
+                    <form id="adminSiteMessageForm" class="admin-form">
+                        <div class="form-group">
+                            <label>Заголовок</label>
+                            <input type="text" id="siteMessageTitle" required placeholder="Важное объявление">
+                        </div>
+                        <div class="form-group">
+                            <label>Текст сообщения</label>
+                            <textarea id="siteMessageContent" rows="4" required placeholder="Текст сообщения..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="siteMessageToAll" checked>
+                                Показать всем пользователям
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Отправить сообщение
+                        </button>
+                    </form>
+                    
+                    <h3 style="margin-top: 2rem;"><i class="fas fa-history"></i> История сообщений</h3>
+                    <div class="admin-messages-list" id="adminMessagesList"></div>
+                </div>
+            </div>
+            
+            <!-- Блокировки -->
+            <div class="admin-tab-content" id="bansTab">
+                <div class="admin-section">
+                    <h3><i class="fas fa-gavel"></i> Активные блокировки</h3>
+                    <div class="admin-bans-list" id="adminBansList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ban User Modal -->
+    <div class="modal" id="banUserModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-modal" onclick="closeBanModal()">&times;</span>
+            <div class="ban-modal-header">
+                <h3><i class="fas fa-gavel"></i> Заблокировать пользователя</h3>
+            </div>
+            <p class="ban-modal-text">Выберите длительность блокировки:</p>
+            <div class="block-options">
+                <button class="block-option" onclick="selectBanDuration(300000)">
+                    <i class="fas fa-clock"></i>
+                    <span>5 минут</span>
+                </button>
+                <button class="block-option" onclick="selectBanDuration(1800000)">
+                    <i class="fas fa-clock"></i>
+                    <span>30 минут</span>
+                </button>
+                <button class="block-option" onclick="selectBanDuration(3600000)">
+                    <i class="fas fa-clock"></i>
+                    <span>1 час</span>
+                </button>
+                <button class="block-option" onclick="selectBanDuration(86400000)">
+                    <i class="fas fa-clock"></i>
+                    <span>24 часа</span>
+                </button>
+                <button class="block-option" onclick="selectBanDuration(604800000)">
+                    <i class="fas fa-clock"></i>
+                    <span>7 дней</span>
+                </button>
+                <button class="block-option permanent" onclick="selectBanDuration('permanent')">
+                    <i class="fas fa-infinity"></i>
+                    <span>Навсегда</span>
+                </button>
+            </div>
+            <div class="ban-modal-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Заблокированный пользователь не сможет писать сообщения</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebase-sync.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

@@ -565,6 +565,238 @@ function saveBlockedUsers() {
     localStorage.setItem('openmessenger_blocks', JSON.stringify(state.blockedUsers));
 }
 
+// ============================================
+// ADMIN PANEL FUNCTIONS
+// ============================================
+
+function openAdminPanel() {
+    // Проверка что пользователь админ
+    if (!state.currentUser || state.currentUser.role !== 'admin') {
+        showNotification('Только для администраторов!', true);
+        return;
+    }
+    
+    document.getElementById('adminPanelModal').classList.add('active');
+    loadAdminPanelData();
+}
+
+function closeAdminPanel() {
+    document.getElementById('adminPanelModal').classList.remove('active');
+}
+
+function switchAdminTab(tabName) {
+    // Переключаем вкладки
+    document.querySelectorAll('.admin-tab').forEach(function(tab) {
+        tab.classList.remove('active');
+        if (tab.dataset.tab === tabName) {
+            tab.classList.add('active');
+        }
+    });
+    
+    document.querySelectorAll('.admin-tab-content').forEach(function(content) {
+        content.classList.remove('active');
+        if (content.id === tabName + 'Tab') {
+            content.classList.add('active');
+        }
+    });
+    
+    // Загружаем данные для вкладки
+    if (tabName === 'users') loadAdminUsers();
+    if (tabName === 'messages') loadAdminMessages();
+    if (tabName === 'bans') loadAdminBans();
+}
+
+function loadAdminPanelData() {
+    loadAdminUsers();
+    loadAdminMessages();
+    loadAdminBans();
+}
+
+function loadAdminUsers() {
+    const list = document.getElementById('adminUsersList');
+    if (!list) return;
+    
+    const allUsers = state.users.concat([{ name: 'misha', role: 'admin', email: 'admin@openstore.com' }]);
+    
+    list.innerHTML = allUsers.map(function(user) {
+        const isBlocked = isUserBlocked(user.name);
+        const blockInfo = isBlocked ? getBlockRemainingTime(user.name) : null;
+        
+        return '<div class="admin-user-item">' +
+            '<div class="admin-user-info">' +
+            '<div class="admin-user-avatar"><i class="fas fa-user"></i></div>' +
+            '<div class="admin-user-details">' +
+            '<div class="admin-user-name">' + user.name + (user.role === 'admin' ? ' 👑' : '') + '</div>' +
+            '<div class="admin-user-email">' + (user.email || 'email@example.com') + '</div>' +
+            (isBlocked ? '<div style="color: var(--danger-color); font-size: 0.85rem;"><i class="fas fa-ban"></i> Заблокирован: ' + blockInfo + '</div>' : '') +
+            '</div>' +
+            '</div>' +
+            '<div class="admin-user-actions">' +
+            (user.name !== 'misha' ? (isBlocked ? 
+                '<button class="admin-btn success" onclick="adminUnblockUser(\'' + user.name + '\')"><i class="fas fa-check"></i> Разблокировать</button>' :
+                '<button class="admin-btn danger" onclick="adminBlockUser(\'' + user.name + '\')"><i class="fas fa-ban"></i> Заблокировать</button>') : '') +
+            '</div>' +
+            '</div>';
+    }).join('');
+}
+
+function loadAdminMessages() {
+    const list = document.getElementById('adminMessagesList');
+    if (!list) return;
+    
+    const messages = state.siteMessages || [];
+    
+    if (messages.length === 0) {
+        list.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Нет сообщений</p>';
+        return;
+    }
+    
+    list.innerHTML = messages.map(function(msg) {
+        return '<div class="admin-message-item">' +
+            '<div class="admin-message-header">' +
+            '<span class="admin-message-title">' + escapeHtml(msg.title) + '</span>' +
+            '<span class="admin-message-date">' + new Date(msg.date).toLocaleString('ru-RU') + '</span>' +
+            '</div>' +
+            '<div class="admin-message-content">' + escapeHtml(msg.content) + '</div>' +
+            '<small style="color: var(--text-secondary);">' + (msg.toAll ? '📢 Всем пользователям' : '🔒 Только админам') + '</small>' +
+            '</div>';
+    }).join('');
+}
+
+function loadAdminBans() {
+    const list = document.getElementById('adminBansList');
+    if (!list) return;
+    
+    const blockedUsers = state.blockedUsers || {};
+    const blockedKeys = Object.keys(blockedUsers);
+    
+    if (blockedKeys.length === 0) {
+        list.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Нет активных блокировок</p>';
+        return;
+    }
+    
+    list.innerHTML = blockedKeys.map(function(username) {
+        const blockUntil = blockedUsers[username];
+        const isPermanent = blockUntil === 'permanent';
+        const remaining = isPermanent ? 'Навсегда' : getBlockRemainingTime(username);
+        const isExpired = !isPermanent && blockUntil < Date.now();
+        
+        return '<div class="admin-ban-item">' +
+            '<div class="admin-ban-header">' +
+            '<span class="admin-ban-user"><i class="fas fa-user"></i> ' + username + '</span>' +
+            '<span class="admin-ban-duration">' + (isPermanent ? '∞ Навсегда' : remaining) + '</span>' +
+            '</div>' +
+            '<div class="admin-ban-info">' +
+            (isPermanent ? 'Заблокирован навсегда' : 'Заблокирован до: ' + new Date(blockUntil).toLocaleString('ru-RU')) +
+            '</div>' +
+            '<div class="admin-ban-actions">' +
+            '<button class="admin-btn success" onclick="adminUnblockUser(\'' + username + '\')"><i class="fas fa-check"></i> Разблокировать</button>' +
+            (isExpired ? '<span style="color: var(--text-secondary);">(Истёк)</span>' : '') +
+            '</div>' +
+            '</div>';
+    }).join('');
+}
+
+function adminBlockUser(username) {
+    if (!confirm('Заблокировать пользователя ' + username + '?')) return;
+    
+    // Блокируем на 24 часа по умолчанию
+    state.blockedUsers[username] = Date.now() + 86400000;
+    saveBlockedUsers();
+    
+    showNotification('Пользователь ' + username + ' заблокирован на 24 часа');
+    loadAdminUsers();
+    loadAdminBans();
+}
+
+function adminUnblockUser(username) {
+    delete state.blockedUsers[username];
+    saveBlockedUsers();
+    
+    showNotification('Пользователь ' + username + ' разблокирован');
+    loadAdminUsers();
+    loadAdminBans();
+}
+
+function sendAdminMessage(e) {
+    e.preventDefault();
+    
+    const title = document.getElementById('siteMessageTitle').value;
+    const content = document.getElementById('siteMessageContent').value;
+    const toAll = document.getElementById('siteMessageToAll').checked;
+    
+    const message = {
+        id: Date.now(),
+        title: title,
+        content: content,
+        date: new Date().toISOString(),
+        toAll: toAll
+    };
+    
+    state.siteMessages.unshift(message);
+    saveSiteMessages();
+    
+    // Сохраняем в Open Store (для главного сайта)
+    try {
+        const existingMessages = JSON.parse(localStorage.getItem('openstore_messages') || '[]');
+        existingMessages.unshift(message);
+        localStorage.setItem('openstore_messages', JSON.stringify(existingMessages));
+    } catch(e) {
+        console.log('Ошибка сохранения сообщений:', e);
+    }
+    
+    showNotification('Сообщение отправлено на сайт!');
+    document.getElementById('adminSiteMessageForm').reset();
+    loadAdminMessages();
+}
+
+function saveSiteMessages() {
+    localStorage.setItem('openmessenger_messages', JSON.stringify(state.siteMessages));
+}
+
+// Добавляем обработчик для формы сообщений
+document.addEventListener('DOMContentLoaded', function() {
+    const adminMessageForm = document.getElementById('adminSiteMessageForm');
+    if (adminMessageForm) {
+        adminMessageForm.addEventListener('submit', sendAdminMessage);
+    }
+});
+
+// ============================================
+// ADMIN BAN MANAGEMENT
+// ============================================
+
+function openBanModal(username) {
+    state.tempBanUser = username;
+    document.getElementById('banUserModal').classList.add('active');
+}
+
+function closeBanModal() {
+    document.getElementById('banUserModal').classList.remove('active');
+    state.tempBanUser = null;
+}
+
+function selectBanDuration(duration) {
+    if (!state.tempBanUser) return;
+    
+    const until = duration === 'permanent' ? 'permanent' : Date.now() + duration;
+    state.blockedUsers[state.tempBanUser] = until;
+    saveBlockedUsers();
+    
+    closeBanModal();
+    
+    const durationText = duration === 'permanent' ? 'навсегда' : formatDuration(duration);
+    showNotification('Пользователь ' + state.tempBanUser + ' заблокирован на ' + durationText);
+    
+    loadAdminUsers();
+    loadAdminBans();
+}
+
+function adminBlockUser(username) {
+    state.tempBanUser = username;
+    openBanModal(username);
+}
+
 function clearChatHistory() {
     if (!state.activeChat) return;
     
@@ -712,3 +944,11 @@ window.closeBlockModal = closeBlockModal;
 window.selectBlockDuration = selectBlockDuration;
 window.clearChatHistory = clearChatHistory;
 window.blockUserFromProfile = blockUserFromProfile;
+window.openAdminPanel = openAdminPanel;
+window.closeAdminPanel = closeAdminPanel;
+window.switchAdminTab = switchAdminTab;
+window.openBanModal = openBanModal;
+window.closeBanModal = closeBanModal;
+window.selectBanDuration = selectBanDuration;
+window.adminBlockUser = adminBlockUser;
+window.adminUnblockUser = adminUnblockUser;
