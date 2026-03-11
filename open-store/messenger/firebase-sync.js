@@ -7,11 +7,18 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Firebase ещё не загружен, ждём...');
         setTimeout(initFirebaseSync, 500);
     } else {
-        initFirebaseSync();
+        setTimeout(initFirebaseSync, 1000); // Ждём пока state инициализируется
     }
 });
 
 function initFirebaseSync() {
+    // Проверяем что state существует
+    if (typeof window.state === 'undefined') {
+        console.log('state ещё не определён, ждём...');
+        setTimeout(initFirebaseSync, 500);
+        return;
+    }
+    
     // Инициализация Firebase
     firebase.initializeApp({
         apiKey: "AIzaSyBBdozFEHO2i9Fg4aHJnp657BlA0T-mvQ4",
@@ -40,14 +47,13 @@ function initFirebaseSync() {
             }
         });
         
-        const originalSaveUsers = window.saveUsers;
         window.saveUsers = function() {
-            if (originalSaveUsers) originalSaveUsers();
+            localStorage.setItem('openstore_all_users', JSON.stringify(window.state.users));
             const usersObj = {};
             window.state.users.forEach(user => {
                 usersObj[user.name] = user;
             });
-            usersRef.set(usersObj);
+            database.ref('users').set(usersObj);
         };
     }
     
@@ -67,14 +73,13 @@ function initFirebaseSync() {
             }
         });
         
-        const originalSaveMessages = window.saveMessages;
         window.saveMessages = function() {
-            if (originalSaveMessages) originalSaveMessages();
+            localStorage.setItem('openmessenger_messages', JSON.stringify(window.state.messages));
             const messagesObj = {};
             window.state.messages.forEach(msg => {
                 messagesObj[msg.id] = msg;
             });
-            messagesRef.set(messagesObj);
+            database.ref('messages').set(messagesObj);
         };
     }
     
@@ -90,10 +95,9 @@ function initFirebaseSync() {
             }
         });
         
-        const originalSaveBlockedUsers = window.saveBlockedUsers;
         window.saveBlockedUsers = function() {
-            if (originalSaveBlockedUsers) originalSaveBlockedUsers();
-            blocksRef.set(window.state.blockedUsers);
+            localStorage.setItem('openmessenger_blocks', JSON.stringify(window.state.blockedUsers));
+            database.ref('blocks').set(window.state.blockedUsers);
         };
     }
     
@@ -109,17 +113,14 @@ function initFirebaseSync() {
             }
         });
         
-        const originalSaveSiteMessages = window.saveSiteMessages;
-        if (originalSaveSiteMessages) {
-            window.saveSiteMessages = function() {
-                originalSaveSiteMessages();
-                const messagesObj = {};
-                window.state.siteMessages.forEach(msg => {
-                    messagesObj[msg.id] = msg;
-                });
-                messagesRef.set(messagesObj);
-            };
-        }
+        window.saveSiteMessages = function() {
+            localStorage.setItem('openstore_messages', JSON.stringify(window.state.siteMessages));
+            const messagesObj = {};
+            window.state.siteMessages.forEach(msg => {
+                messagesObj[msg.id] = msg;
+            });
+            database.ref('siteMessages').set(messagesObj);
+        };
     }
     
     // Запуск синхронизации
