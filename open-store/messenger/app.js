@@ -25,6 +25,12 @@ async function init() {
     checkAuth();
     
     setupEventListeners();
+    
+    // Запускаем Firebase синхронизацию ПОСЛЕ полной инициализации
+    if (typeof startFirebaseSync === 'function') {
+        console.log('Запуск Firebase синхронизации...');
+        startFirebaseSync();
+    }
 }
 
 // Загрузка данных из Open Store

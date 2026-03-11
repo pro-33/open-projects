@@ -1,16 +1,17 @@
 // Firebase синхронизация для Messenger
+// Вызывается из app.js через startFirebaseSync()
 
-setTimeout(function() {
-    console.log('Firebase: Проверяю window.state...');
+var database = null;
+
+function startFirebaseSync() {
+    console.log('Firebase: Запуск синхронизации...');
     
     if (typeof window.state === 'undefined') {
-        console.log('Firebase: state не готов, жду ещё 1 сек...');
-        setTimeout(arguments.callee, 1000);
+        console.error('Firebase: window.state не определён!');
         return;
     }
     
-    console.log('Firebase: state найден! Инициализация...');
-    
+    // Инициализация Firebase
     firebase.initializeApp({
         apiKey: "AIzaSyBBdozFEHO2i9Fg4aHJnp657BlA0T-mvQ4",
         authDomain: "open-projects-b5f16.firebaseapp.com",
@@ -21,15 +22,18 @@ setTimeout(function() {
         measurementId: "G-HK35D6DKL5"
     });
     
-    var database = firebase.database();
+    database = firebase.database();
     console.log('✅ Firebase синхронизация запущена!');
     
+    // ===== СИХРОНИЗАЦИЯ ПОЛЬЗОВАТЕЛЕЙ =====
     var usersRef = database.ref('users');
+    
     usersRef.on('value', function(snapshot) {
         var data = snapshot.val();
         if (data) {
             window.state.users = Object.values(data);
             localStorage.setItem('openstore_all_users', JSON.stringify(window.state.users));
+            console.log('👥 Пользователи синхронизированы:', window.state.users.length);
             if (typeof loadChats === 'function') loadChats();
         }
     });
@@ -43,12 +47,15 @@ setTimeout(function() {
         usersRef.set(usersObj);
     };
     
+    // ===== СИХРОНИЗАЦИЯ СООБЩЕНИЙ =====
     var messagesRef = database.ref('messages');
+    
     messagesRef.on('value', function(snapshot) {
         var data = snapshot.val();
         if (data) {
             window.state.messages = Object.values(data);
             localStorage.setItem('openmessenger_messages', JSON.stringify(window.state.messages));
+            console.log('💬 Сообщения синхронизированы:', window.state.messages.length);
             if (window.state.activeChat && typeof loadMessages === 'function') {
                 loadMessages(window.state.activeChat);
             }
@@ -65,12 +72,15 @@ setTimeout(function() {
         messagesRef.set(messagesObj);
     };
     
+    // ===== СИХРОНИЗАЦИЯ БЛОКИРОВОК =====
     var blocksRef = database.ref('blocks');
+    
     blocksRef.on('value', function(snapshot) {
         var data = snapshot.val();
         if (data !== null) {
             window.state.blockedUsers = data;
             localStorage.setItem('openmessenger_blocks', JSON.stringify(window.state.blockedUsers));
+            console.log('🚫 Блокировки синхронизированы');
         }
     });
     
@@ -79,12 +89,15 @@ setTimeout(function() {
         blocksRef.set(window.state.blockedUsers);
     };
     
+    // ===== СИХРОНИЗАЦИЯ СООБЩЕНИЙ САЙТА =====
     var siteMessagesRef = database.ref('siteMessages');
+    
     siteMessagesRef.on('value', function(snapshot) {
         var data = snapshot.val();
         if (data) {
             window.state.siteMessages = Object.values(data);
             localStorage.setItem('openstore_messages', JSON.stringify(window.state.siteMessages));
+            console.log('📢 Сообщения сайта синхронизированы:', window.state.siteMessages.length);
         }
     });
     
@@ -97,4 +110,5 @@ setTimeout(function() {
         siteMessagesRef.set(messagesObj);
     };
     
-}, 1500);
+    console.log('✅ Все обработчики синхронизации установлены');
+}
