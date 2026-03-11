@@ -1,10 +1,15 @@
 // Firebase синхронизация для Messenger
 
 setTimeout(function() {
+    console.log('Firebase: Проверяю window.state...');
+    
     if (typeof window.state === 'undefined') {
-        console.log('Firebase: state не определён');
+        console.log('Firebase: state не готов, жду ещё 1 сек...');
+        setTimeout(arguments.callee, 1000);
         return;
     }
+    
+    console.log('Firebase: state найден! Инициализация...');
     
     firebase.initializeApp({
         apiKey: "AIzaSyBBdozFEHO2i9Fg4aHJnp657BlA0T-mvQ4",
@@ -17,7 +22,7 @@ setTimeout(function() {
     });
     
     var database = firebase.database();
-    console.log('Firebase синхронизация запущена!');
+    console.log('✅ Firebase синхронизация запущена!');
     
     var usersRef = database.ref('users');
     usersRef.on('value', function(snapshot) {

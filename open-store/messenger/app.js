@@ -2,13 +2,13 @@
 
 const OPEN_STORE_PATH = '../open-store/app.js';
 
-let state = {
+window.state = {
     currentUser: null,
     users: [],
     chats: [],
     messages: [],
     activeChat: null,
-    blockedUsers: {}, // { username: blockUntilTimestamp }
+    blockedUsers: {},
     viewingProfile: null
 };
 
