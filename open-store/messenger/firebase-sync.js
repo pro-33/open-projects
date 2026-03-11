@@ -1,10 +1,5 @@
 // Firebase конфигурация для синхронизации между устройствами
-// Используем CDN версию для прямой работы в браузере
-
-// Запускаем синхронизацию после загрузки app.js
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initFirebaseSync, 500);
-});
+// Вызывается из app.js после инициализации state
 
 function initFirebaseSync() {
     // Проверяем что state существует
