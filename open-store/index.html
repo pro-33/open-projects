@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Store - Магазин Open-Source Приложений</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-store"></i>
+                <span>Open Store</span>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Поиск приложений...">
+            </div>
+            <div class="nav-actions">
+                <button class="nav-btn" id="loginBtn">
+                    <i class="fas fa-user"></i>
+                    <span>Войти</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Герой-секция -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Добро пожаловать в <span class="highlight">Open Store</span></h1>
+            <p>Откройте для себя лучшие open-source приложения</p>
+        </div>
+    </section>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+        <!-- Фильтры -->
+        <aside class="filters-sidebar">
+            <div class="filter-section">
+                <h3><i class="fas fa-filter"></i> Фильтры</h3>
+                
+                <div class="filter-group">
+                    <label>Категория</label>
+                    <select id="categoryFilter">
+                        <option value="all">Все категории</option>
+                        <option value="productivity">Продуктивность</option>
+                        <option value="development">Разработка</option>
+                        <option value="multimedia">Мультимедиа</option>
+                        <option value="utilities">Утилиты</option>
+                        <option value="security">Безопасность</option>
+                        <option value="education">Образование</option>
+                        <option value="network">Сеть</option>
+                        <option value="games">Игры</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Платформа</label>
+                    <div class="rating-filter">
+                        <input type="radio" name="platform" value="all" checked> Все
+                        <input type="radio" name="platform" value="linux"> <i class="fab fa-linux" style="color: #fbbf24;"></i> Linux
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Рейтинг</label>
+                    <div class="rating-filter">
+                        <input type="radio" name="rating" value="all" checked> Все
+                        <input type="radio" name="rating" value="4+"> 4+ ★
+                        <input type="radio" name="rating" value="3+"> 3+ ★
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Цена</label>
+                    <select id="priceFilter">
+                        <option value="all">Любая</option>
+                        <option value="free">Бесплатно</option>
+                        <option value="paid">Платно</option>
+                    </select>
+                </div>
+
+                <button class="reset-filters" id="resetFilters">
+                    <i class="fas fa-redo"></i> Сбросить
+                </button>
+            </div>
+        </aside>
+
+        <!-- Каталог приложений -->
+        <section class="apps-catalog">
+            <div class="catalog-header">
+                <h2><i class="fas fa-th-large"></i> Каталог приложений</h2>
+                <div class="sort-options">
+                    <select id="sortSelect">
+                        <option value="popular">По популярности</option>
+                        <option value="rating">По рейтингу</option>
+                        <option value="stars">По звёздам GitHub</option>
+                        <option value="newest">По новизне</option>
+                        <option value="name">По названию</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="apps-grid" id="appsGrid"></div>
+
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Загрузка приложений...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Модальное окно входа/регистрации -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Вход</button>
+                <button class="auth-tab" data-tab="register">Регистрация</button>
+            </div>
+            
+            <!-- Форма входа -->
+            <form id="loginForm" class="auth-form active">
+                <h2><i class="fas fa-sign-in-alt"></i> Вход в аккаунт</h2>
+                <div class="form-group">
+                    <label for="loginUsername">Имя пользователя</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Войти</button>
+            </form>
+            
+            <!-- Форма регистрации -->
+            <form id="registerForm" class="auth-form">
+                <h2><i class="fas fa-user-plus"></i> Регистрация</h2>
+                <div class="form-group">
+                    <label for="regUsername">Имя пользователя</label>
+                    <input type="text" id="regUsername" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Пароль</label>
+                    <input type="password" id="regPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="regPasswordConfirm">Подтвердите пароль</label>
+                    <input type="password" id="regPasswordConfirm" required minlength="6">
+                </div>
+                <button type="submit" class="submit-btn">Зарегистрироваться</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно приложения -->
+    <div class="modal app-modal" id="appModal">
+        <div class="modal-content app-modal-content">
+            <span class="close-modal" id="closeAppModal">&times;</span>
+            <div class="app-detail" id="appDetail"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно профиля -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content profile-modal-content">
+            <span class="close-modal" id="closeProfileModal">&times;</span>
+            
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-info">
+                    <h2 id="profileName">Username</h2>
+                    <p id="profileEmail" class="profile-email">email@example.com</p>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-download"></i>
+                            <span id="profileDownloads">0</span>
+                            <small>Скачиваний</small>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span id="profileRating">0</span>
+                            <small>Рейтинг</small>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-box"></i>
+                            <span id="profileApps">0</span>
+                            <small>Приложений</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="my-apps">Мои приложения</button>
+                <button class="profile-tab" data-tab="favorites">Избранное</button>
+                <button class="profile-tab" data-tab="reviews">Отзывы</button>
+            </div>
+            
+            <div class="profile-content">
+                <div class="profile-tab-content active" id="myAppsTab">
+                    <button class="add-app-btn" id="addAppBtn">
+                        <i class="fas fa-plus"></i> Добавить своё приложение
+                    </button>
+                    <div class="user-apps-list" id="userAppsList"></div>
+                </div>
+                
+                <div class="profile-tab-content" id="favoritesTab">
+                    <div class="user-apps-list" id="favoritesList"></div>
+                </div>
+                
+                <div class="profile-tab-content" id="reviewsTab">
+                    <div class="user-reviews-list" id="reviewsList"></div>
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <button class="profile-action-btn" id="editProfileBtn">
+                    <i class="fas fa-edit"></i> Редактировать профиль
+                </button>
+                <button class="profile-action-btn danger" id="deleteAccountBtn" style="display: none;">
+                    <i class="fas fa-trash"></i> Удалить аккаунт
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования профиля -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeEditProfileModal">&times;</span>
+            <form id="editProfileForm">
+                <h2><i class="fas fa-user-edit"></i> Редактирование профиля</h2>
+                <div class="form-group">
+                    <label for="editUsername">Имя пользователя</label>
+                    <input type="text" id="editUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="editBio">О себе</label>
+                    <textarea id="editBio" rows="3" placeholder="Расскажите о себе..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editPassword">Новый пароль (оставьте пустым, чтобы не менять)</label>
+                    <input type="password" id="editPassword" minlength="6">
+                </div>
+                <button type="submit" class="submit-btn">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления приложения -->
+    <div class="modal" id="addAppModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeAddAppModal">&times;</span>
+            <form id="addAppForm">
+                <h2><i class="fas fa-plus-circle"></i> Добавить приложение</h2>
+                <div class="form-group">
+                    <label for="appName">Название приложения *</label>
+                    <input type="text" id="appName" required>
+                </div>
+                <div class="form-group">
+                    <label for="appDescription">Краткое описание *</label>
+                    <input type="text" id="appDescription" required maxlength="150">
+                </div>
+                <div class="form-group">
+                    <label for="appLongDescription">Полное описание</label>
+                    <textarea id="appLongDescription" rows="4" placeholder="Подробное описание приложения..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="appCategory">Категория *</label>
+                        <select id="appCategory" required>
+                            <option value="development">Разработка</option>
+                            <option value="multimedia">Мультимедиа</option>
+                            <option value="productivity">Продуктивность</option>
+                            <option value="utilities">Утилиты</option>
+                            <option value="security">Безопасность</option>
+                            <option value="education">Образование</option>
+                            <option value="network">Сеть</option>
+                            <option value="games">Игры</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="appPrice">Цена</label>
+                        <select id="appPrice">
+                            <option value="free">Бесплатно</option>
+                            <option value="paid">Платно</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="appGithub">GitHub репозиторий *</label>
+                        <input type="text" id="appGithub" required placeholder="username/repo">
+                    </div>
+                    <div class="form-group">
+                        <label for="appVersion">Версия</label>
+                        <input type="text" id="appVersion" placeholder="1.0.0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="appIsLinux">
+                        <i class="fab fa-linux"></i> Поддержка Linux
+                    </label>
+                </div>
+                <button type="submit" class="submit-btn">Отправить на модерацию</button>
+                <p class="form-hint">Ваше приложение будет проверено модератором перед публикацией</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Админ-панель -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-header">
+            <h3><i class="fas fa-shield-alt"></i> Панель администратора</h3>
+            <button class="close-admin" id="closeAdmin">&times;</button>
+        </div>
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="dashboard">Обзор</button>
+            <button class="tab-btn" data-tab="moderation">Модерация</button>
+            <button class="tab-btn" data-tab="users">Пользователи</button>
+            <button class="tab-btn" data-tab="apps">Приложения</button>
+            <button class="tab-btn" data-tab="messages">Сообщения</button>
+            <button class="tab-btn" data-tab="files">Файлы</button>
+        </div>
+        <div class="admin-content">
+            <div class="tab-content active" id="dashboardTab">
+                <div class="admin-stats">
+                    <div class="admin-stat-card">
+                        <i class="fas fa-users"></i>
+                        <span class="stat-value" id="adminUserCount">0</span>
+                        <span class="stat-label">Пользователей</span>
+                    </div>
+                    <div class="admin-stat-card">
+                        <i class="fas fa-box"></i>
+                        <span class="stat-value" id="adminAppCount">0</span>
+                        <span class="stat-label">Приложений</span>
+                    </div>
+                    <div class="admin-stat-card">
+                        <i class="fas fa-download"></i>
+                        <span class="stat-value" id="adminDownloadCount">0</span>
+                        <span class="stat-label">Скачиваний</span>
+                    </div>
+                </div>
+                <div class="admin-recent" id="adminRecentApps">
+                    <h4>Последние приложения</h4>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="moderationTab">
+                <h3 style="margin-bottom: 1rem;"><i class="fas fa-clipboard-check"></i> Приложения на модерации</h3>
+                <div class="moderation-list" id="moderationAppsList"></div>
+            </div>
+            
+            <div class="tab-content" id="usersTab">
+                <div class="admin-users-list" id="adminUsersList"></div>
+            </div>
+            
+            <div class="tab-content" id="appsTab">
+                <div class="admin-apps-list" id="adminAppsList"></div>
+            </div>
+            
+            <div class="tab-content" id="messagesTab">
+                <form id="adminMessageForm">
+                    <div class="form-group">
+                        <label for="messageTitle">Заголовок сообщения</label>
+                        <input type="text" id="messageTitle" required placeholder="Важное объявление">
+                    </div>
+                    <div class="form-group">
+                        <label for="messageContent">Содержание</label>
+                        <textarea id="messageContent" rows="4" required placeholder="Текст сообщения..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="messageToAll" checked>
+                            Отправить всем пользователям
+                        </label>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Отправить сообщение
+                    </button>
+                </form>
+                <div class="admin-messages-history" id="adminMessagesHistory"></div>
+            </div>
+            
+            <div class="tab-content" id="filesTab">
+                <div class="file-manager">
+                    <div class="file-path" id="filePath">/</div>
+                    <div class="file-list" id="fileList"></div>
+                    <div class="file-actions">
+                        <button class="action-btn" id="uploadFile">
+                            <i class="fas fa-upload"></i> Загрузить
+                        </button>
+                        <button class="action-btn" id="createFolder">
+                            <i class="fas fa-folder-plus"></i> Папка
+                        </button>
+                    </div>
+                    <textarea class="file-editor" id="fileEditor" placeholder="Редактор файлов..."></textarea>
+                    <button class="save-btn" id="saveFile">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
+    </div>
+
+    <!-- Сообщения на сайте -->
+    <div class="site-messages" id="siteMessages"></div>
+
+    <footer class="footer">
+        <p>&copy; 2026 Open Store. Все права защищены.</p>
+        <p>Powered by GitHub Pages</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

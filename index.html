@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Projects - Экосистема открытых приложений</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>Open Projects</span>
+            </div>
+            <div class="nav-links">
+                <a href="#projects">Проекты</a>
+                <a href="#features">Преимущества</a>
+                <a href="#about">О нас</a>
+            </div>
+            <div class="nav-actions">
+                <a href="open-store/messenger/index.html" class="nav-btn">
+                    <i class="fas fa-comments"></i>
+                    <span>Мессенджер</span>
+                </a>
+                <a href="open-store/index.html" class="nav-btn primary">
+                    <i class="fas fa-store"></i>
+                    <span>Open Store</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Герой-секция -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-star"></i>
+                <span>Открытые проекты</span>
+            </div>
+            <h1>Экосистема <span class="gradient-text">открытых</span> приложений</h1>
+            <p class="hero-description">
+                Открытые проекты с открытым исходным кодом для современного веба. 
+                Скачивайте приложения, общайтесь с друзьями — всё в одном месте.
+            </p>
+            <div class="hero-buttons">
+                <a href="open-store/index.html" class="btn btn-primary btn-lg">
+                    <i class="fas fa-store"></i>
+                    <span>Открыть Open Store</span>
+                </a>
+                <a href="open-store/messenger/index.html" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-comments"></i>
+                    <span>Открыть Мессенджер</span>
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-value">48+</span>
+                    <span class="stat-label">Приложений</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">∞</span>
+                    <span class="stat-label">Бесплатно</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">24/7</span>
+                    <span class="stat-label">Доступно</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Проекты -->
+    <section class="projects" id="projects">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Наши проекты</span>
+                <h2>Выберите приложение</h2>
+                <p>Два мощных инструмента для ваших задач</p>
+            </div>
+
+            <div class="projects-grid">
+                <!-- Open Store Card -->
+                <div class="project-card featured">
+                    <div class="project-badge">Популярное</div>
+                    <div class="project-icon store-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3>Open Store</h3>
+                    <p class="project-description">
+                        Магазин open-source приложений с интеграцией GitHub. 
+                        Скачивайте программы, добавляйте свои проекты, оценивайте и комментируйте.
+                    </p>
+                    <ul class="project-features">
+                        <li><i class="fas fa-check"></i> 48+ приложений</li>
+                        <li><i class="fas fa-check"></i> Интеграция с GitHub</li>
+                        <li><i class="fas fa-check"></i> Система рейтингов</li>
+                        <li><i class="fas fa-check"></i> Админ-панель</li>
+                        <li><i class="fas fa-check"></i> Модерация приложений</li>
+                    </ul>
+                    <div class="project-actions">
+                        <a href="open-store/index.html" class="btn btn-primary btn-block">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>Запустить</span>
+                        </a>
+                        <a href="https://github.com" target="_blank" class="btn btn-ghost">
+                            <i class="fab fa-github"></i>
+                            <span>GitHub</span>
+                        </a>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">JavaScript</span>
+                    </div>
+                </div>
+
+                <!-- Open Messenger Card -->
+                <div class="project-card">
+                    <div class="project-icon messenger-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h3>Open Messenger</h3>
+                    <p class="project-description">
+                        Современный веб-мессенджер с интеграцией аккаунтов Open Store. 
+                        Общайтесь с друзьями, отправляйте файлы до 2GB.
+                    </p>
+                    <ul class="project-features">
+                        <li><i class="fas fa-check"></i> Мгновенные сообщения</li>
+                        <li><i class="fas fa-check"></i> Файлы до 2GB</li>
+                        <li><i class="fas fa-check"></i> Блокировка пользователей</li>
+                        <li><i class="fas fa-check"></i> Просмотр профилей</li>
+                        <li><i class="fas fa-check"></i> Общий аккаунт с Open Store</li>
+                    </ul>
+                    <div class="project-actions">
+                        <a href="open-store/messenger/index.html" class="btn btn-primary btn-block">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>Запустить</span>
+                        </a>
+                        <a href="https://github.com" target="_blank" class="btn btn-ghost">
+                            <i class="fab fa-github"></i>
+                            <span>GitHub</span>
+                        </a>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">JavaScript</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Преимущества -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Преимущества</span>
+                <h2>Почему выбирают нас</h2>
+                <p>Современные решения для ваших задач</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock-open"></i>
+                    </div>
+                    <h3>Открытый исходный код</h3>
+                    <p>Полностью открытый код. Изучайте, модифицируйте, используйте в своих проектах.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Безопасность</h3>
+                    <p>Ваши данные под защитой. Никакой телеметрии, никаких скрытых сборов информации.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Быстродействие</h3>
+                    <p>Оптимизированный код и современные технологии для максимальной скорости работы.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Адаптивность</h3>
+                    <p>Работает на любых устройствах: компьютер, планшет, смартфон.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Сообщество</h3>
+                    <p>Активное сообщество разработчиков и пользователей. Помощь и поддержка.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-infinity"></i>
+                    </div>
+                    <h3>Бесплатно</h3>
+                    <p>Все проекты полностью бесплатны. Никаких скрытых платежей и подписок.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- О нас -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <span class="section-tag">О проекте</span>
+                    <h2>Создаём будущее <span class="gradient-text">открытого ПО</span></h2>
+                    <p>
+                        Open Projects — это экосистема открытых приложений, созданных сообществом 
+                        для сообщества. Мы верим в силу открытого исходного кода и стремимся 
+                        сделать качественные инструменты доступными для всех.
+                    </p>
+                    <p>
+                        Наши проекты используют современные веб-технологии и лучшие практики 
+                        разработки. Мы постоянно работаем над улучшением и добавлением новых функций.
+                    </p>
+                    <div class="about-stats">
+                        <div class="about-stat">
+                            <span class="stat-number">2</span>
+                            <span class="stat-label">Проекта</span>
+                        </div>
+                        <div class="about-stat">
+                            <span class="stat-number">48+</span>
+                            <span class="stat-label">Приложений</span>
+                        </div>
+                        <div class="about-stat">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Open Source</span>
+                        </div>
+                    </div>
+                    <a href="https://github.com" target="_blank" class="btn btn-primary">
+                        <i class="fab fa-github"></i>
+                        <span>Внести вклад</span>
+                    </a>
+                </div>
+                <div class="about-image">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-dot red"></span>
+                            <span class="code-dot yellow"></span>
+                            <span class="code-dot green"></span>
+                        </div>
+                        <pre><code><span class="code-keyword">const</span> <span class="code-var">projects</span> = {
+  <span class="code-key">name</span>: <span class="code-string">"Open Projects"</span>,
+  <span class="code-key">openSource</span>: <span class="code-bool">true</span>,
+  <span class="code-key">apps</span>: [
+    <span class="code-string">"Open Store"</span>,
+    <span class="code-string">"Open Messenger"</span>
+  ],
+  <span class="code-key">license</span>: <span class="code-string">"MIT"</span>
+};</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <i class="fas fa-cube"></i>
+                        <span>Open Projects</span>
+                    </div>
+                    <p>Экосистема открытых приложений для современного веба.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Проекты</h4>
+                    <a href="open-store/index.html">Open Store</a>
+                    <a href="open-store/messenger/index.html">Open Messenger</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Ресурсы</h4>
+                    <a href="#">Документация</a>
+                    <a href="#">API</a>
+                    <a href="#">Сообщество</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Компания</h4>
+                    <a href="#">О нас</a>
+                    <a href="#">Контакты</a>
+                    <a href="#">Лицензия</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Open Projects. Все права защищены.</p>
+                <p>Создано с <i class="fas fa-heart" style="color: var(--danger-color);"></i> для сообщества</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

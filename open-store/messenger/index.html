@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Messenger - Веб-мессенджер</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Экран входа -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <i class="fas fa-paper-plane"></i>
+                <h1>Open Messenger</h1>
+                <p>Быстрый и безопасный мессенджер</p>
+            </div>
+            
+            <div class="auth-card">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Вход</button>
+                    <button class="auth-tab" data-tab="register">Регистрация</button>
+                </div>
+                
+                <form id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label>Имя пользователя</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-sign-in-alt"></i> Войти
+                    </button>
+                    <p class="auth-hint">
+                        Нет аккаунта? <a href="#" onclick="switchAuth('register')">Зарегистрироваться</a>
+                    </p>
+                </form>
+                
+                <form id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label>Имя пользователя</label>
+                        <input type="text" id="regUsername" required minlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="regPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Подтвердите пароль</label>
+                        <input type="password" id="regPasswordConfirm" required minlength="6">
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-user-plus"></i> Зарегистрироваться
+                    </button>
+                    <p class="auth-hint">
+                        Есть аккаунт? <a href="#" onclick="switchAuth('login')">Войти</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной интерфейс мессенджера -->
+    <div class="messenger-container" id="messengerContainer" style="display: none;">
+        <!-- Боковая панель -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile" onclick="toggleProfileMenu()">
+                    <div class="user-avatar" id="currentUserAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name" id="currentUserName">User</span>
+                        <span class="user-status">Онлайн</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="profile-menu" id="profileMenu">
+                    <a href="#" onclick="openProfile()"><i class="fas fa-user"></i> Профиль</a>
+                    <a href="../open-store/index.html"><i class="fas fa-store"></i> Open Store</a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                </div>
+            </div>
+            
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="chatSearch" placeholder="Поиск чатов...">
+            </div>
+            
+            <div class="chat-list" id="chatList">
+                <!-- Чаты будут загружены здесь -->
+            </div>
+        </aside>
+
+        <!-- Окно чата -->
+        <main class="chat-main">
+            <div class="no-chat-selected" id="noChatSelected">
+                <i class="fas fa-comments"></i>
+                <h2>Выберите чат для начала общения</h2>
+                <p>Или создайте новый чат</p>
+            </div>
+            
+            <div class="chat-window" id="chatWindow" style="display: none;">
+                <div class="chat-header">
+                    <div class="chat-user-info">
+                        <div class="chat-avatar" id="chatAvatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="chat-details">
+                            <h3 id="chatUserName">Username</h3>
+                            <span class="chat-status" id="chatStatus">Онлайн</span>
+                        </div>
+                    </div>
+                    <div class="chat-actions">
+                        <button onclick="viewUserProfile()" title="Профиль"><i class="fas fa-user"></i></button>
+                        <button onclick="clearChatHistory()" title="Очистить"><i class="fas fa-trash"></i></button>
+                        <button onclick="toggleBlockUser()" title="Заблокировать"><i class="fas fa-ban" id="blockIcon"></i></button>
+                    </div>
+                </div>
+                
+                <div class="messages-container" id="messagesContainer">
+                    <!-- Сообщения будут здесь -->
+                </div>
+                
+                <div class="message-input">
+                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
+                    <button type="button" class="attach-btn" id="attachBtn" title="Прикрепить файл">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <input type="text" id="messageInput" placeholder="Напишите сообщение..." autocomplete="off">
+                    <button type="button" class="emoji-btn"><i class="fas fa-smile"></i></button>
+                    <button type="button" class="send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Уведомления -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
+    </div>
+
+    <!-- Модальное окно профиля пользователя -->
+    <div class="modal" id="userProfileModal">
+        <div class="modal-content profile-modal">
+            <span class="close-modal" onclick="closeUserProfileModal()">&times;</span>
+            <div class="profile-modal-header">
+                <div class="profile-modal-avatar" id="viewProfileAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2 id="viewProfileName">Username</h2>
+                <p class="profile-modal-email" id="viewProfileEmail">email@example.com</p>
+                <div class="profile-modal-info">
+                    <div class="info-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>Зарегистрирован:</span>
+                        <strong id="viewProfileJoined">01.01.2024</strong>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-store"></i>
+                        <span>Приложений:</span>
+                        <strong id="viewProfileApps">0</strong>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-shield"></i>
+                        <span>Роль:</span>
+                        <strong id="viewProfileRole">Пользователь</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-modal-actions">
+                <button class="modal-btn primary" onclick="sendMessageToUser()"><i class="fas fa-paper-plane"></i> Написать сообщение</button>
+                <button class="modal-btn danger" onclick="blockUserFromProfile()"><i class="fas fa-ban"></i> Заблокировать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно блокировки -->
+    <div class="modal" id="blockUserModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-modal" onclick="closeBlockModal()">&times;</span>
+            <h3><i class="fas fa-ban"></i> Заблокировать пользователя</h3>
+            <p style="color: var(--text-secondary); margin: 1rem 0;">Выберите длительность блокировки:</p>
+            <div class="block-options">
+                <button class="block-option" onclick="selectBlockDuration(300000)">
+                    <i class="fas fa-clock"></i>
+                    <span>5 минут</span>
+                </button>
+                <button class="block-option" onclick="selectBlockDuration(1800000)">
+                    <i class="fas fa-clock"></i>
+                    <span>30 минут</span>
+                </button>
+                <button class="block-option" onclick="selectBlockDuration(3600000)">
+                    <i class="fas fa-clock"></i>
+                    <span>1 час</span>
+                </button>
+                <button class="block-option" onclick="selectBlockDuration(86400000)">
+                    <i class="fas fa-clock"></i>
+                    <span>24 часа</span>
+                </button>
+                <button class="block-option" onclick="selectBlockDuration(604800000)">
+                    <i class="fas fa-clock"></i>
+                    <span>7 дней</span>
+                </button>
+                <button class="block-option permanent" onclick="selectBlockDuration('permanent')">
+                    <i class="fas fa-infinity"></i>
+                    <span>Навсегда</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Индикатор загрузки файла -->
+    <div class="upload-progress" id="uploadProgress" style="display: none;">
+        <div class="progress-content">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span id="uploadFileName">file.zip</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span id="uploadProgressText">0%</span>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
