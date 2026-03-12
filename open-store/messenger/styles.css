@@ -247,10 +247,17 @@ body {
     padding: 0.5rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     z-index: 100;
+    margin-top: 0.5rem;
 }
 
 .profile-menu.active {
     display: block;
+    animation: menuSlide 0.2s ease;
+}
+
+@keyframes menuSlide {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .profile-menu a {
@@ -391,6 +398,52 @@ body {
     border-radius: 10px;
     min-width: 20px;
     text-align: center;
+}
+
+/* Стили для новых пользователей */
+.chat-item.new-user {
+    background: rgba(139, 92, 246, 0.1);
+    border-left: 3px solid var(--secondary-color);
+}
+
+.chat-item-avatar.new {
+    background: var(--gradient-2);
+}
+
+.add-user-btn {
+    background: var(--success-color);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.add-user-btn:hover {
+    background: var(--success-color);
+    transform: scale(1.1);
+}
+
+/* Секции чатов */
+.chat-section {
+    margin-bottom: 1rem;
+}
+
+.chat-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-left: 3px solid var(--primary-color);
 }
 
 /* Основное окно чата */
@@ -1641,4 +1694,228 @@ body {
     color: var(--text-secondary);
     font-size: 0.9rem;
     line-height: 1.4;
+}
+
+/* Fake Message Overlay */
+.fake-message-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.fake-message-overlay.active {
+    opacity: 1;
+}
+
+.fake-message-content {
+    background: var(--bg-card);
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    padding: 3rem;
+    max-width: 90%;
+    width: 600px;
+    text-align: center;
+    animation: messageSlide 0.3s ease;
+}
+
+@keyframes messageSlide {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.fake-message-from {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.fake-message-text {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+}
+
+.fake-message-close {
+    background: var(--gradient);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.fake-message-close:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+}
+
+/* Troll Menu Styles */
+.troll-modal-content {
+    border: 2px solid var(--danger-color);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--bg-card) 100%);
+}
+
+.troll-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--danger-color);
+}
+
+.troll-panel-header h3 {
+    color: var(--danger-color);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.troll-target {
+    background: var(--danger-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.troll-option {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.troll-option:hover {
+    border-color: var(--danger-color);
+    background: rgba(239, 68, 68, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.2);
+}
+
+.troll-option i {
+    font-size: 2rem;
+    color: var(--danger-color);
+}
+
+.troll-option span {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Settings Styles */
+.settings-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+}
+
+.settings-section h4 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.avatar-selector {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.75rem;
+}
+
+.avatar-option {
+    aspect-ratio: 1;
+    background: var(--bg-dark);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.avatar-option:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    padding: 1rem;
+    background: var(--bg-dark);
+    border-radius: 12px;
+}
+
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-text {
+    flex: 1;
+    font-size: 1rem;
+}
+
+.toggle-switch {
+    width: 50px;
+    height: 26px;
+    background: var(--border-color);
+    border-radius: 50px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-text + .toggle-switch {
+    background: var(--success-color);
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-text + .toggle-switch::after {
+    left: 27px;
 }

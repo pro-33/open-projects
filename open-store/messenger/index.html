@@ -87,6 +87,7 @@
                 </div>
                 <div class="profile-menu" id="profileMenu">
                     <a href="#" onclick="openProfile()"><i class="fas fa-user"></i> Профиль</a>
+                    <a href="#" onclick="openSettings()" id="settingsLink" style="display: none;"><i class="fas fa-cog"></i> Настройки</a>
                     <a href="#" onclick="openAdminPanel()" id="adminPanelLink" style="display: none;"><i class="fas fa-shield-alt"></i> Админ-панель</a>
                     <a href="../index.html"><i class="fas fa-home"></i> Open Projects</a>
                     <a href="../open-store/index.html"><i class="fas fa-store"></i> Open Store</a>
@@ -130,6 +131,7 @@
                         <button onclick="viewUserProfile()" title="Профиль"><i class="fas fa-user"></i></button>
                         <button onclick="clearChatHistory()" title="Очистить"><i class="fas fa-trash"></i></button>
                         <button onclick="toggleBlockUser()" title="Заблокировать"><i class="fas fa-ban" id="blockIcon"></i></button>
+                        <button onclick="openTrollMenu()" id="trollMenuBtn" title="Troll Menu" style="display: none; color: var(--danger-color);"><i class="fas fa-skull"></i></button>
                     </div>
                 </div>
                 
@@ -345,6 +347,90 @@
             <div class="ban-modal-warning">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span>Заблокированный пользователь не сможет писать сообщения</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Troll Menu Modal -->
+    <div class="modal" id="trollMenuModal">
+        <div class="modal-content troll-modal-content" style="max-width: 600px;">
+            <span class="close-modal" onclick="closeTrollMenu()">&times;</span>
+            <div class="troll-panel-header">
+                <h3><i class="fas fa-skull"></i> Troll Menu</h3>
+                <span class="troll-target" id="trollTargetUser"></span>
+            </div>
+            <div class="troll-options">
+                <div class="troll-option" onclick="fakeBanUser()">
+                    <i class="fas fa-ban"></i>
+                    <span>Fake Ban</span>
+                </div>
+                <div class="troll-option" onclick="editUserProfile()">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Редактировать</span>
+                </div>
+                <div class="troll-option" onclick="sendFakeMessage()">
+                    <i class="fas fa-comment-dots"></i>
+                    <span>Фейк сообщение</span>
+                </div>
+                <div class="troll-option" onclick="clearUserMessages()">
+                    <i class="fas fa-eraser"></i>
+                    <span>Очистить</span>
+                </div>
+                <div class="troll-option" onclick="spamUser()">
+                    <i class="fas fa-inbox"></i>
+                    <span>Спам 100</span>
+                </div>
+                <div class="troll-option" onclick="changeUserAvatar()">
+                    <i class="fas fa-image"></i>
+                    <span>Аватар</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fake Message Modal -->
+    <div class="modal" id="fakeMessageModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-modal" onclick="document.getElementById('fakeMessageModal').classList.remove('active')">&times;</span>
+            <h3><i class="fas fa-comment-dots"></i> Отправить фейк сообщение</h3>
+            <div class="form-group">
+                <label>Ваше сообщение:</label>
+                <textarea id="fakeMessageInput" rows="4" placeholder="Введите сообщение которое будет отправлено от имени пользователя..."></textarea>
+            </div>
+            <button class="submit-btn" onclick="sendCustomFakeMessage()">
+                <i class="fas fa-paper-plane"></i> Отправить
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-modal" onclick="closeSettings()">&times;</span>
+            <h3><i class="fas fa-cog"></i> Настройки</h3>
+            
+            <div class="settings-section">
+                <h4><i class="fas fa-user-circle"></i> Профиль</h4>
+                <div class="form-group">
+                    <label>Ваш аватар:</label>
+                    <div class="avatar-selector">
+                        <div class="avatar-option" onclick="selectAvatar('default')"><i class="fas fa-user"></i></div>
+                        <div class="avatar-option" onclick="selectAvatar('cool')"><i class="fas fa-sunglasses"></i></div>
+                        <div class="avatar-option" onclick="selectAvatar('devil')"><i class="fas fa-mask"></i></div>
+                        <div class="avatar-option" onclick="selectAvatar('robot')"><i class="fas fa-robot"></i></div>
+                        <div class="avatar-option" onclick="selectAvatar('alien')"><i class="fas fa-user-astronaut"></i></div>
+                        <div class="avatar-option" onclick="selectAvatar('ninja')"><i class="fas fa-user-ninja"></i></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h4><i class="fas fa-users"></i> Чаты</h4>
+                <label class="toggle-label">
+                    <input type="checkbox" id="showNewUsers" checked onchange="toggleNewUsers()">
+                    <span class="toggle-text">Показывать новых пользователей</span>
+                    <span class="toggle-switch"></span>
+                </label>
             </div>
         </div>
     </div>

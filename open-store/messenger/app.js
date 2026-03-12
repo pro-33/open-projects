@@ -199,56 +199,146 @@ function loadChats() {
     
     console.log('Загрузка чатов:', otherUsers.length, 'пользователей');
     
+    // Проверяем настройку "Показывать новых"
+    var showNewUsers = localStorage.getItem('showNewUsers');
+    if (showNewUsers === null) showNewUsers = 'true';
+    showNewUsers = (showNewUsers === 'true');
+    
     if (otherUsers.length === 0) {
         chatList.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);"><i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i><p>Нет других пользователей</p><p style="font-size: 0.85rem;">Зарегистрируйтесь на другом устройстве</p></div>';
         return;
     }
     
-    chatList.innerHTML = otherUsers.map(function(user) {
-        // Получаем последние сообщения
-        const userMessages = window.state.messages.filter(function(m) {
-            return (m.from === window.state.currentUser.name && m.to === user.name) ||
-                   (m.from === user.name && m.to === window.state.currentUser.name);
-        });
+    // Проверяем есть ли у пользователя список добавленных
+    if (!window.state.currentUser.addedUsers) {
+        window.state.currentUser.addedUsers = [];
+    }
+    
+    // Разделяем на добавленные и новые
+    var addedUsers = otherUsers.filter(function(u) {
+        return window.state.currentUser.addedUsers.indexOf(u.name) !== -1;
+    });
+    
+    var newUsers = otherUsers.filter(function(u) {
+        return window.state.currentUser.addedUsers.indexOf(u.name) === -1;
+    });
+    
+    var html = '';
+    
+    // Секция добавленных пользователей
+    if (addedUsers.length > 0) {
+        html += '<div class="chat-section"><div class="chat-section-title"><i class="fas fa-comments"></i> Чаты</div>';
+        html += addedUsers.map(function(user) {
+            return createChatItem(user);
+        }).join('');
+        html += '</div>';
+    }
+    
+    // Секция новых пользователей (только если включена настройка)
+    if (newUsers.length > 0 && showNewUsers) {
+        html += '<div class="chat-section"><div class="chat-section-title"><i class="fas fa-user-plus"></i> Новые (' + newUsers.length + ')</div><div style="font-size: 0.75rem; color: var(--text-secondary); padding: 0.5rem 1rem;">Нажмите + чтобы добавить в чаты</div>';
+        html += newUsers.map(function(user) {
+            return createChatItem(user, true);
+        }).join('');
+        html += '</div>';
+    } else if (newUsers.length > 0 && !showNewUsers) {
+        html += '<div class="chat-section"><div class="chat-section-title"><i class="fas fa-eye-slash"></i> Новые скрыты</div><div style="font-size: 0.75rem; color: var(--text-secondary); padding: 0.5rem 1rem;">Включите в настройках чтобы показать</div></div>';
+    }
+    
+    chatList.innerHTML = html;
+}
+
+// Создание элемента чата
+function createChatItem(user, isNew) {
+    const userMessages = window.state.messages.filter(function(m) {
+        return (m.from === window.state.currentUser.name && m.to === user.name) ||
+               (m.from === user.name && m.to === window.state.currentUser.name);
+    });
+    
+    const lastMessage = userMessages.length > 0 ? userMessages[userMessages.length - 1] : null;
+    const unreadCount = userMessages.filter(function(m) {
+        return m.to === window.state.currentUser.name && !m.read;
+    }).length;
+    
+    return '<div class="chat-item' + (isNew ? ' new-user' : '') + '" onclick="' + (isNew ? 'addUser(\'' + user.name + '\')' : 'openChat(\'' + user.name + '\')') + '">' +
+        '<div class="chat-item-avatar' + (isNew ? ' new' : ' online') + '"><i class="fas fa-user"></i></div>' +
+        '<div class="chat-item-info">' +
+        '<div class="chat-item-header">' +
+        '<span class="chat-item-name">' + user.name + '</span>' +
+        (isNew ? '<button class="add-user-btn" onclick="event.stopPropagation(); addUser(\'' + user.name + '\')"><i class="fas fa-plus"></i></button>' : '<span class="chat-item-time">' + (lastMessage ? formatTime(lastMessage.time) : '') + '</span>') +
+        '</div>' +
+        '<div class="chat-item-message">' + (lastMessage ? lastMessage.text : (isNew ? 'Нет сообщений' : 'Нажмите чтобы начать чат')) + '</div>' +
+        '</div>' +
+        (!isNew && unreadCount > 0 ? '<span class="chat-item-badge">' + unreadCount + '</span>' : '') +
+        '</div>';
+}
+
+// Добавление пользователя
+function addUser(username) {
+    if (!window.state.currentUser.addedUsers) {
+        window.state.currentUser.addedUsers = [];
+    }
+    
+    if (window.state.currentUser.addedUsers.indexOf(username) === -1) {
+        window.state.currentUser.addedUsers.push(username);
         
-        const lastMessage = userMessages.length > 0 ? userMessages[userMessages.length - 1] : null;
-        const unreadCount = userMessages.filter(function(m) {
-            return m.to === window.state.currentUser.name && !m.read;
-        }).length;
+        // Сохраняем в localStorage и Firebase
+        localStorage.setItem('openstore_user', JSON.stringify(window.state.currentUser));
         
-        return '<div class="chat-item" onclick="openChat(\'' + user.name + '\')">' +
-            '<div class="chat-item-avatar online"><i class="fas fa-user"></i></div>' +
-            '<div class="chat-item-info">' +
-            '<div class="chat-item-header">' +
-            '<span class="chat-item-name">' + user.name + '</span>' +
-            '<span class="chat-item-time">' + (lastMessage ? formatTime(lastMessage.time) : '') + '</span>' +
-            '</div>' +
-            '<div class="chat-item-message">' + (lastMessage ? lastMessage.text : 'Нет сообщений') + '</div>' +
-            '</div>' +
-            (unreadCount > 0 ? '<span class="chat-item-badge">' + unreadCount + '</span>' : '') +
-            '</div>';
-    }).join('');
+        // Обновляем в Firebase
+        if (database && database.ref) {
+            var usersRef = database.ref('users');
+            usersRef.once('value', function(snapshot) {
+                var data = snapshot.val();
+                if (data && data[window.state.currentUser.name]) {
+                    data[window.state.currentUser.name].addedUsers = window.state.currentUser.addedUsers;
+                    usersRef.update(data);
+                }
+            });
+        }
+        
+        showNotification('Пользователь ' + username + ' добавлен в чаты!');
+        loadChats();
+    }
 }
 
 // Открытие чата
 function openChat(username) {
-    state.activeChat = username;
-    
+    window.state.activeChat = username;
+
     // Обновляем активный класс
     document.querySelectorAll('.chat-item').forEach(function(item) {
         item.classList.remove('active');
     });
     event.currentTarget.classList.add('active');
-    
+
     // Показываем окно чата
     document.getElementById('noChatSelected').style.display = 'none';
     document.getElementById('chatWindow').style.display = 'flex';
-    
+
     // Обновляем заголовок
     document.getElementById('chatUserName').textContent = username;
     
+    // Показываем Troll Menu кнопку ТОЛЬКО для админа misha
+    var trollBtn = document.getElementById('trollMenuBtn');
+    if (trollBtn) {
+        console.log('Проверка админа:', window.state.currentUser);
+        if (window.state.currentUser && window.state.currentUser.name === 'misha') {
+            trollBtn.style.display = 'flex';
+            console.log('Troll Menu показан!');
+        } else {
+            trollBtn.style.display = 'none';
+            console.log('Troll Menu скрыт (не админ)');
+        }
+    }
+
     // Загружаем сообщения
     loadMessages(username);
+    
+    // Закрываем мобильное меню
+    if (window.innerWidth <= 768) {
+        toggleMobileMenu();
+    }
 }
 
 // Загрузка сообщений
@@ -775,6 +865,233 @@ function toggleMobileMenu() {
     }
 }
 
+// Настройки
+function openProfile() {
+    toggleProfileMenu();
+    // Показываем ссылку на настройки ВСЕГДА
+    var settingsLink = document.getElementById('settingsLink');
+    if (settingsLink) {
+        settingsLink.style.display = 'flex';
+        console.log('Кнопка настроек показана!');
+    } else {
+        console.log('Кнопка настроек не найдена!');
+    }
+}
+
+function openSettings() {
+    toggleProfileMenu();
+    document.getElementById('settingsModal').classList.add('active');
+    
+    // Загружаем настройки
+    var showNew = localStorage.getItem('showNewUsers');
+    if (showNew !== null) {
+        document.getElementById('showNewUsers').checked = (showNew === 'true');
+    }
+    
+    // Загружаем аватар
+    var avatar = localStorage.getItem('userAvatar');
+    if (avatar) {
+        selectAvatar(avatar);
+    }
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').classList.remove('active');
+}
+
+function toggleNewUsers() {
+    var showNew = document.getElementById('showNewUsers').checked;
+    localStorage.setItem('showNewUsers', showNew);
+    loadChats();
+    showNotification('Настройки сохранены!');
+}
+
+function selectAvatar(avatarType) {
+    localStorage.setItem('userAvatar', avatarType);
+    
+    // Обновляем иконку в профиле
+    var avatarEl = document.getElementById('currentUserAvatar');
+    if (avatarEl) {
+        var icons = {
+            'default': 'fa-user',
+            'cool': 'fa-sunglasses',
+            'devil': 'fa-mask',
+            'robot': 'fa-robot',
+            'alien': 'fa-user-astronaut',
+            'ninja': 'fa-user-ninja'
+        };
+        avatarEl.innerHTML = '<i class="fas ' + icons[avatarType] + '"></i>';
+    }
+    
+    showNotification('Аватар сохранён!');
+}
+
+// Troll Menu для админа
+var trollTargetUser = null;
+
+function openTrollMenu() {
+    if (!window.state.currentUser || window.state.currentUser.role !== 'admin') {
+        showNotification('Только для администраторов!', true);
+        return;
+    }
+    
+    if (!window.state.activeChat) {
+        showNotification('Выберите чат сначала!', true);
+        return;
+    }
+    
+    trollTargetUser = window.state.activeChat;
+    document.getElementById('trollTargetUser').textContent = trollTargetUser;
+    document.getElementById('trollMenuModal').classList.add('active');
+}
+
+function closeTrollMenu() {
+    document.getElementById('trollMenuModal').classList.remove('active');
+    trollTargetUser = null;
+}
+
+function fakeBanUser() {
+    if (!trollTargetUser) return;
+    
+    var banMessages = [
+        'Ваш аккаунт заблокирован за нарушение правил!',
+        'Вы нарушили условия использования. Доступ ограничен.',
+        'Администратор заблокировал ваш аккаунт.',
+        'Обнаружена подозрительная активность. Аккаунт заморожен.'
+    ];
+    
+    var randomMsg = banMessages[Math.floor(Math.random() * banMessages.length)];
+    
+    var message = {
+        id: Date.now(),
+        from: 'System',
+        to: trollTargetUser,
+        text: randomMsg,
+        time: new Date().toISOString(),
+        read: false,
+        type: 'system'
+    };
+    
+    window.state.messages.push(message);
+    saveMessages();
+    
+    showNotification('Fake Ban отправлен!');
+    closeTrollMenu();
+}
+
+function editUserProfile() {
+    if (!trollTargetUser) return;
+    
+    var newName = prompt('Новое имя для ' + trollTargetUser + ':');
+    if (newName) {
+        var userIndex = window.state.users.findIndex(function(u) { return u.name === trollTargetUser; });
+        if (userIndex !== -1) {
+            window.state.users[userIndex].name = newName;
+            localStorage.setItem('openstore_all_users', JSON.stringify(window.state.users));
+            showNotification('Имя изменено на ' + newName);
+            closeTrollMenu();
+            loadChats();
+        }
+    }
+}
+
+function sendFakeMessage() {
+    if (!trollTargetUser) return;
+    
+    // Открываем модальное окно для ввода своего сообщения
+    document.getElementById('trollMenuModal').classList.remove('active');
+    document.getElementById('fakeMessageModal').classList.add('active');
+}
+
+function sendCustomFakeMessage() {
+    if (!trollTargetUser) return;
+    
+    var customMsg = document.getElementById('fakeMessageInput').value;
+    if (!customMsg) {
+        showNotification('Введите сообщение!', true);
+        return;
+    }
+    
+    var message = {
+        id: Date.now(),
+        from: trollTargetUser,
+        to: window.state.currentUser.name,
+        text: customMsg,
+        time: new Date().toISOString(),
+        read: false
+    };
+    
+    window.state.messages.push(message);
+    saveMessages();
+    
+    // Показываем сообщение на весь экран
+    showFakeMessageFullScreen(customMsg, trollTargetUser);
+    
+    document.getElementById('fakeMessageModal').classList.remove('active');
+    document.getElementById('fakeMessageInput').value = '';
+    showNotification('Фейк сообщение отправлено!');
+    loadMessages(window.state.activeChat);
+}
+
+function showFakeMessageFullScreen(text, from) {
+    var overlay = document.createElement('div');
+    overlay.id = 'fakeMessageOverlay';
+    overlay.className = 'fake-message-overlay';
+    overlay.innerHTML = '<div class="fake-message-content"><div class="fake-message-from">' + from + '</div><div class="fake-message-text">' + text + '</div><button class="fake-message-close" onclick="this.parentElement.parentElement.remove()">Закрыть</button></div>';
+    document.body.appendChild(overlay);
+    
+    setTimeout(function() {
+        overlay.classList.add('active');
+    }, 100);
+}
+
+function clearUserMessages() {
+    if (!trollTargetUser) return;
+    
+    if (confirm('Удалить все сообщения с ' + trollTargetUser + '?')) {
+        window.state.messages = window.state.messages.filter(function(m) {
+            return !((m.from === trollTargetUser || m.to === trollTargetUser) && 
+                     (m.to === window.state.currentUser.name || m.from === window.state.currentUser.name));
+        });
+        saveMessages();
+        showNotification('Сообщения удалены!');
+        closeTrollMenu();
+        loadMessages(window.state.activeChat);
+    }
+}
+
+function spamUser() {
+    if (!trollTargetUser) return;
+    
+    if (confirm('Отправить 100 сообщений?')) {
+        for (var i = 0; i < 100; i++) {
+            var message = {
+                id: Date.now() + i,
+                from: trollTargetUser,
+                to: window.state.currentUser.name,
+                text: 'Сообщение #' + (i + 1),
+                time: new Date().toISOString(),
+                read: false
+            };
+            window.state.messages.push(message);
+        }
+        saveMessages();
+        showNotification('Спам отправлен!');
+        closeTrollMenu();
+        loadMessages(window.state.activeChat);
+    }
+}
+
+function changeUserAvatar() {
+    if (!trollTargetUser) return;
+    
+    var colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+    var randomColor = colors[Math.floor(Math.random() * colors.length)];
+    
+    showNotification('Аватар изменён на ' + randomColor);
+    closeTrollMenu();
+}
+
 // Добавляем обработчик для формы сообщений
 document.addEventListener('DOMContentLoaded', function() {
     const adminMessageForm = document.getElementById('adminSiteMessageForm');
@@ -847,7 +1164,17 @@ function logout() {
 
 // Профиль меню
 function toggleProfileMenu() {
-    document.getElementById('profileMenu').classList.toggle('active');
+    const menu = document.getElementById('profileMenu');
+    if (menu) {
+        menu.classList.toggle('active');
+        
+        // Показываем кнопку настроек когда меню открыто
+        var settingsLink = document.getElementById('settingsLink');
+        if (settingsLink && menu.classList.contains('active')) {
+            settingsLink.style.display = 'flex';
+            console.log('Кнопка настроек показана!');
+        }
+    }
 }
 
 function openProfile() {
@@ -974,3 +1301,17 @@ window.selectBanDuration = selectBanDuration;
 window.adminBlockUser = adminBlockUser;
 window.adminUnblockUser = adminUnblockUser;
 window.toggleMobileMenu = toggleMobileMenu;
+window.openTrollMenu = openTrollMenu;
+window.closeTrollMenu = closeTrollMenu;
+window.fakeBanUser = fakeBanUser;
+window.editUserProfile = editUserProfile;
+window.sendFakeMessage = sendFakeMessage;
+window.clearUserMessages = clearUserMessages;
+window.spamUser = spamUser;
+window.changeUserAvatar = changeUserAvatar;
+window.addUser = addUser;
+window.openSettings = openSettings;
+window.closeSettings = closeSettings;
+window.toggleNewUsers = toggleNewUsers;
+window.selectAvatar = selectAvatar;
+window.sendCustomFakeMessage = sendCustomFakeMessage;
