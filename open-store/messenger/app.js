@@ -193,23 +193,27 @@ function loadChats() {
     const chatList = document.getElementById('chatList');
     
     // Получаем всех пользователей кроме текущего
-    const otherUsers = state.users.filter(u => u.name !== state.currentUser.name);
+    const otherUsers = window.state.users.filter(function(u) { 
+        return u.name !== window.state.currentUser.name; 
+    });
+    
+    console.log('Загрузка чатов:', otherUsers.length, 'пользователей');
     
     if (otherUsers.length === 0) {
-        chatList.innerHTML = '<p style="padding: 2rem; text-align: center; color: var(--text-secondary);">Нет других пользователей</p>';
+        chatList.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);"><i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i><p>Нет других пользователей</p><p style="font-size: 0.85rem;">Зарегистрируйтесь на другом устройстве</p></div>';
         return;
     }
     
     chatList.innerHTML = otherUsers.map(function(user) {
         // Получаем последние сообщения
-        const userMessages = state.messages.filter(function(m) {
-            return (m.from === state.currentUser.name && m.to === user.name) ||
-                   (m.from === user.name && m.to === state.currentUser.name);
+        const userMessages = window.state.messages.filter(function(m) {
+            return (m.from === window.state.currentUser.name && m.to === user.name) ||
+                   (m.from === user.name && m.to === window.state.currentUser.name);
         });
         
         const lastMessage = userMessages.length > 0 ? userMessages[userMessages.length - 1] : null;
         const unreadCount = userMessages.filter(function(m) {
-            return m.to === state.currentUser.name && !m.read;
+            return m.to === window.state.currentUser.name && !m.read;
         }).length;
         
         return '<div class="chat-item" onclick="openChat(\'' + user.name + '\')">' +
@@ -757,7 +761,18 @@ function sendAdminMessage(e) {
 }
 
 function saveSiteMessages() {
-    localStorage.setItem('openmessenger_messages', JSON.stringify(state.siteMessages));
+    localStorage.setItem('openmessenger_messages', JSON.stringify(window.state.siteMessages));
+}
+
+// Мобильное меню
+function toggleMobileMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    if (sidebar && overlay) {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
 }
 
 // Добавляем обработчик для формы сообщений
@@ -958,3 +973,4 @@ window.closeBanModal = closeBanModal;
 window.selectBanDuration = selectBanDuration;
 window.adminBlockUser = adminBlockUser;
 window.adminUnblockUser = adminUnblockUser;
+window.toggleMobileMenu = toggleMobileMenu;

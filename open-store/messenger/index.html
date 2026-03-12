@@ -67,8 +67,13 @@
 
     <!-- Основной интерфейс мессенджера -->
     <div class="messenger-container" id="messengerContainer" style="display: none;">
+        <!-- Кнопка мобильного меню -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        
         <!-- Боковая панель -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="user-profile" onclick="toggleProfileMenu()">
                     <div class="user-avatar" id="currentUserAvatar">
@@ -98,6 +103,9 @@
                 <!-- Чаты будут загружены здесь -->
             </div>
         </aside>
+
+        <!-- Затемнение фона для мобильных -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
 
         <!-- Окно чата -->
         <main class="chat-main">
@@ -343,7 +351,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="app.js"></script>
-    <script src="firebase-sync.js"></script>
+    <script src="app.js?v=2"></script>
+    <script src="firebase-sync.js?v=2"></script>
 </body>
 </html>
