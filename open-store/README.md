@@ -1,6 +1,4 @@
-# Open Store 🚀
 
-**Магазин Open-Source Приложений** — платформа для скачивания open-source программ с GitHub.
 
 ## 🌟 Особенности
 
@@ -72,31 +70,4 @@ open-store/
     "icon": "fas fa-icon",
     "longDescription": "Полное описание",
     "githubRepo": "username/repo",
-    "releaseDate": "2024-01-01"
-}
-```
-
-## 🎨 Категории
-
-- **Продуктивность** — productivity
-- **Разработка** — development
-- **Мультимедиа** — multimedia
-- **Утилиты** — utilities
-- **Безопасность** — security
-- **Образование** — education
-
-## 🛠 Технологии
-
-- HTML5
-- CSS3 (Custom Properties, Grid, Flexbox)
-- Vanilla JavaScript (ES6+)
-- Font Awesome (иконки)
-- Google Fonts (Inter)
-
-## 📝 Лицензия
-
-MIT License — свободно используйте и модифицируйте!
-
----
-
-**Open Store** © 2026 | Powered by GitHub Pages
+    "releaseDate": "2024-01-01
